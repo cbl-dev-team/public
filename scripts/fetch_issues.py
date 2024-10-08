@@ -21,13 +21,89 @@ def fetch_open_issues(org, repo):
         return []
 
 def generate_html(issues_by_repo):
-    html_content = """<html><body><h1>Open Issues</h1><ul>"""
+    # Add some basic CSS for styling
+    html_content = """
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+            }
+            h1 {
+                color: #333;
+            }
+            h2 {
+                color: #555;
+                margin-top: 30px;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            li {
+                margin-bottom: 10px;
+            }
+            a {
+                text-decoration: none;
+                color: #0073e6;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .label {
+                font-weight: bold;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 10px;
+            }
+            .high-priority {
+                background-color: #ff4d4d;
+                color: white;
+            }
+            .medium-priority {
+                background-color: #ffa500;
+                color: white;
+            }
+            .low-priority {
+                background-color: #4CAF50;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Open Issues</h1>
+    """
+
     for repo, issues in issues_by_repo.items():
         html_content += f"<h2>{repo}</h2><ul>"
-        for issue in issues:
-            html_content += f'<li><a href="{issue["html_url"]}">{issue["title"]}</a></li>'
+        
+        if issues:
+            for issue in issues:
+                # Check if any labels are related to priority
+                labels = issue.get("labels", [])
+                label_text = ""
+                
+                # Check for specific priority labels
+                for label in labels:
+                    if label["name"].lower() == "high-priority":
+                        label_text = '<span class="label high-priority">[High Priority]</span>'
+                    elif label["name"].lower() == "medium-priority":
+                        label_text = '<span class="label medium-priority">[Medium Priority]</span>'
+                    elif label["name"].lower() == "low-priority":
+                        label_text = '<span class="label low-priority">[Low Priority]</span>'
+                
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">{issue["title"]}</a></li>'
+        else:
+            html_content += "<li>No open issues</li>"
+        
         html_content += "</ul>"
-    html_content += "</ul></body></html>"
+
+    html_content += """
+    </body>
+    </html>
+    """
+
     return html_content
 
 def main():
