@@ -12,14 +12,26 @@ headers = {
 }
 
 def fetch_open_issues(org, repo):
-    url = f'https://api.github.com/repos/{org}/{repo}/issues?state=open'
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Failed to fetch issues for {repo}: {response.status_code}")
-        return []
-
+    issues = []
+    page = 1
+    while True:
+        url = f'https://api.github.com/repos/{org}/{repo}/issues?state=open&per_page=100&page={page}'
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            print(f"Failed to fetch issues for {repo}: {response.status_code}")
+            break
+        data = response.json()
+        if not data:  # No more issues
+            break
+        
+        # Filter out pull requests by checking if "pull_request" key exists in the issue
+        filtered_issues = [issue for issue in data if "pull_request" not in issue]
+        
+        issues.extend(filtered_issues)
+        page += 1
+    
+    return issues
+    
 def generate_html(issues_by_repo):
     # Add some basic CSS for styling
     html_content = """
