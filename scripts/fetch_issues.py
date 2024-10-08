@@ -37,9 +37,8 @@ def generate_html(issues_by_repo):
                 color: #555;
                 margin-top: 30px;
             }
-            ul {
-                list-style-type: none;
-                padding: 0;
+            ol {
+                padding-left: 20px;
             }
             li {
                 margin-bottom: 10px;
@@ -76,10 +75,13 @@ def generate_html(issues_by_repo):
     """
 
     for repo, issues in issues_by_repo.items():
-        html_content += f"<h2>{repo}</h2><ul>"
+        html_content += f"<h2>{repo}</h2><ol>"
         
         if issues:
             for issue in issues:
+                # Get the issue number
+                issue_number = issue.get("number", "")
+                
                 # Check if any labels are related to priority
                 labels = issue.get("labels", [])
                 label_text = ""
@@ -93,11 +95,12 @@ def generate_html(issues_by_repo):
                     elif label["name"].lower() == "low-priority":
                         label_text = '<span class="label low-priority">[Low Priority]</span>'
                 
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">{issue["title"]}</a></li>'
+                # Format issue with number and priority label
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a></li>'
         else:
             html_content += "<li>No open issues</li>"
         
-        html_content += "</ul>"
+        html_content += "</ol>"
 
     html_content += """
     </body>
