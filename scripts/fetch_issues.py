@@ -3,7 +3,7 @@ import os
 
 ORG_NAME = 'cbl-dev-team'
 REPOSITORIES = ['cbl-v2', 'CBL-LiveScoring', 'cbl-backend']
-GITHUB_TOKEN = ${{ secrets.ACCESS_TOKEN_GIT }}
+GITHUB_TOKEN = os.getenv('ACCESS_TOKEN_GIT')
 OUTPUT_FILE = 'docs/index.html'
 
 headers = {
