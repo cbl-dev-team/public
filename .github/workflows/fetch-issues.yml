@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write  # Required for GitHub Pages deployment
+  contents: write  # Required to access the repository content
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -43,4 +47,4 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
