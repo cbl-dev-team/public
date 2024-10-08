@@ -11,6 +11,7 @@ on:
 permissions:
   id-token: write  # Required for GitHub Pages deployment
   contents: write  # Required to access the repository content
+  pages: write     # Required to deploy to GitHub Pages
 
 jobs:
   build-and-deploy:
