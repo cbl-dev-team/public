@@ -29,6 +29,8 @@ jobs:
 
       # Step 4: Run the Python script to fetch issues and generate index.html
       - name: Run Python script to fetch issues
+        env:
+          ACCESS_TOKEN_GIT: ${{ secrets.ACCESS_TOKEN_GIT }}  # Pass secret as env var
         run: python scripts/fetch_issues.py
 
       # Step 5: Upload the generated site files
