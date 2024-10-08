@@ -23,7 +23,7 @@ jobs:
       - name: Upload site files
         uses: actions/upload-pages-artifact@v1
         with:
-          path: docs/index.html  # Specify the location of your index.html or static files
+          path: docs/index.html  # Specify the correct location of your index.html
 
       # Step 4: Deploy to GitHub Pages (this step deploys the artifact)
       - name: Deploy to GitHub Pages
