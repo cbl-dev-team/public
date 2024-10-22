@@ -80,6 +80,14 @@ def generate_html(issues_by_repo):
                 background-color: #4CAF50;
                 color: white;
             }
+            .assignees {
+                font-weight: bold;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 10px;
+                background-color: #3f8df2;
+                color: white;
+            }
         </style>
     </head>
     <body>
@@ -116,7 +124,7 @@ def generate_html(issues_by_repo):
                     assignee_names = "Unassigned"
 
                 # Format issue with number, priority label, and assignee
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - Assigned to: {assignee_names}</li>'
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> <span class="label low-priority" {assignee_names} </span></li>'
         else:
             html_content += "<li>No open issues</li>"
         
