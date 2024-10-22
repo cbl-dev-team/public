@@ -2,7 +2,7 @@ import requests
 import os
 
 ORG_NAME = 'cbl-dev-team'
-REPOSITORIES = ['cbl-v2', 'CBL-LiveScoring', 'cbl-backend']
+REPOSITORIES = ['cbl-web-app', 'cbl-mobile-app', 'cbl-backend']
 GITHUB_TOKEN = os.getenv('ACCESS_TOKEN_GIT')
 OUTPUT_FILE = 'docs/index.html'
 
@@ -83,7 +83,7 @@ def generate_html(issues_by_repo):
         </style>
     </head>
     <body>
-        <h1>Open Issues</h1>
+        <h1>CBL Project - Open Issues</h1>
     """
 
     for repo, issues in issues_by_repo.items():
