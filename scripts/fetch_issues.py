@@ -108,11 +108,11 @@ def generate_html(issues_by_repo):
                         label_text = '<span class="label low-priority">[Low Priority]</span>'
 
                 # Get assignee information (assumes one assignee per issue)
-                assignee = issue.get("assignee", {})
-                assignee_name = assignee.get("login", "Unassigned")
+                assignees = issue.get("assignees", {})
+                # assignee_name = assignee.get("login", "Unassigned")
 
                 # Format issue with number, priority label, and assignee
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - Assigned to: {assignee_name}</li>'
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - Assigned to: {assignees}</li>'
         else:
             html_content += "<li>No open issues</li>"
         
