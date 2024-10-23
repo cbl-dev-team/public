@@ -131,12 +131,12 @@ def generate_html(issues_by_repo):
                     elif label["name"].lower() == "low-priority":
                         label_text = '<span class="label low-priority">[Low Priority]</span>'
 
-                # create bug or task tag
                 for label in labels:
-                    if label["name"].lower() == "bug":
-                        bug_task_label = '<span class="bug-label">[Bug]</span>'
+                    # Strip leading or trailing spaces before comparison
+                    if label["name"].strip().lower() in ["bug", "bugs"]:
+                        bug_task_label = '<span class="bug-label">Bug</span>'
                     else:
-                        bug_task_label = '<span class="task-label">[Task]</span>'
+                        bug_task_label = '<span class="task-label">Task</span>'
 
                 # Get assignee information (assumes one assignee per issue)
                 assignees = issue.get("assignees", [])
@@ -144,7 +144,7 @@ def generate_html(issues_by_repo):
                     # Format the assignees into a comma-separated list
                     assignee_names = ", ".join([assignee["login"] for assignee in assignees])
                 else:
-                    assignee_names = "Unassigned"
+                    assignee_names = "None"
 
                 # Format issue with number, priority label, and assignee
                 html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> {bug_task_label} <span class="assignees"> {assignee_names} </span></li>'
