@@ -88,6 +88,22 @@ def generate_html(issues_by_repo):
                 background-color: #3f8df2;
                 color: white;
             }
+            .bug-label {
+                font-weight: bold;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 10px;
+                background-color: #ff4d4d;
+                color: white;
+            }
+            .task-label {
+                font-weight: bold;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 10px;
+                background-color: #4CAF50;
+                color: white;
+            }
         </style>
     </head>
     <body>
@@ -115,6 +131,13 @@ def generate_html(issues_by_repo):
                     elif label["name"].lower() == "low-priority":
                         label_text = '<span class="label low-priority">[Low Priority]</span>'
 
+                # create bug or task tag
+                for label in labels:
+                    if label["name"].lower() == "bugs":
+                        bug_task_label = '<span class="bug-label">[Bug]</span>'
+                    else
+                        bug_task_label = '<span class="task-label">[Task]</span>'
+
                 # Get assignee information (assumes one assignee per issue)
                 assignees = issue.get("assignees", [])
                 if assignees:
@@ -124,7 +147,7 @@ def generate_html(issues_by_repo):
                     assignee_names = "Unassigned"
 
                 # Format issue with number, priority label, and assignee
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> <span class="assignees"> {assignee_names} </span></li>'
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> {bug_task_label} <span class="assignees"> {assignee_names} </span></li>'
         else:
             html_content += "<li>No open issues</li>"
         
