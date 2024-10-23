@@ -140,11 +140,10 @@ def generate_html(issues_by_repo):
                 if assignees:
                     # Format the assignees into a comma-separated list
                     assignee_names = ", ".join([assignee["login"] for assignee in assignees])
-                else:
-                    assignee_names = "None"
+                    assignee_tag = f'<span class="assignees"> {assignee_names} </span>'
 
                 # Format issue with number, priority label, and assignee
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> {bug_task_label} <span class="assignees"> {assignee_names} </span></li>'
+                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> {bug_task_label} {assignee_tag} </li>'
         else:
             html_content += "<li>No open issues</li>"
         
