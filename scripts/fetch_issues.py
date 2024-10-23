@@ -137,6 +137,7 @@ def generate_html(issues_by_repo):
 
                 # Get assignee information
                 assignees = issue.get("assignees", [])
+                assignee_tag = ''
                 if assignees:
                     # Format the assignees into a comma-separated list
                     assignee_names = ", ".join([assignee["login"] for assignee in assignees])
