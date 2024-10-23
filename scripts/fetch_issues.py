@@ -124,6 +124,9 @@ def generate_html(issues_by_repo):
                 
                 # Check for specific priority labels
                 for label in labels:
+                    if label["name"].strip().lower() in ["bug", "bugs"]:
+                        bug_task_label = '<span class="bug-label">Bug</span>'
+                        
                     if label["name"].lower() == "high-priority":
                         label_text = '<span class="label high-priority">[High Priority]</span>'
                     elif label["name"].lower() == "medium-priority":
@@ -131,14 +134,7 @@ def generate_html(issues_by_repo):
                     elif label["name"].lower() == "low-priority":
                         label_text = '<span class="label low-priority">[Low Priority]</span>'
 
-                for label in labels:
-                    # Strip leading or trailing spaces before comparison
-                    if label["name"].strip().lower() in ["bug", "bugs"]:
-                        bug_task_label = '<span class="bug-label">Bug</span>'
-                    else:
-                        bug_task_label = '<span class="task-label">Task</span>'
-
-                # Get assignee information (assumes one assignee per issue)
+                # Get assignee information
                 assignees = issue.get("assignees", [])
                 if assignees:
                     # Format the assignees into a comma-separated list
