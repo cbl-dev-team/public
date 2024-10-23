@@ -123,6 +123,7 @@ def generate_html(issues_by_repo):
                 label_text = ""
                 
                 # Check for specific priority labels
+                bug_task_label = ''
                 for label in labels:
                     if label["name"].strip().lower() in ["bug", "bugs"]:
                         bug_task_label = '<span class="bug-label">Bug</span>'
