@@ -133,7 +133,7 @@ def generate_html(issues_by_repo):
 
                 # create bug or task tag
                 for label in labels:
-                    if label["name"].lower() == "bugs":
+                    if label["name"].lower() == "bug":
                         bug_task_label = '<span class="bug-label">[Bug]</span>'
                     else:
                         bug_task_label = '<span class="task-label">[Task]</span>'
