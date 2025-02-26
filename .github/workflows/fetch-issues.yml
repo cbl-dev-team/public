@@ -20,11 +20,11 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v4  # Updated to latest version
+        uses: actions/checkout@v4
 
       # Step 2: Set up Python environment
       - name: Set up Python
-        uses: actions/setup-python@v5  # Updated to latest version
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -35,17 +35,27 @@ jobs:
       # Step 4: Run the Python script to fetch issues and generate index.html
       - name: Run Python script to fetch issues
         env:
-          ACCESS_TOKEN_GIT: ${{ secrets.ACCESS_TOKEN_GIT }}  # Pass secret as env var
+          ACCESS_TOKEN_GIT: ${{ secrets.ACCESS_TOKEN_GIT }}
         run: python scripts/fetch_issues.py
 
-      # Step 5: Upload the generated site files (Updated to latest version)
+      # Step 5: Upload site files
       - name: Upload site files
-        uses: actions/upload-artifact@v4  # Updated to v4
+        uses: actions/upload-artifact@v4
         with:
-          path: docs/  # The folder that contains index.html
+          name: github-pages  # Artifact name must match
+          path: docs/  # Path to your generated site files
 
-      # Step 6: Deploy to GitHub Pages
+      # Step 6: Setup GitHub Pages
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      # Step 7: Download the uploaded artifact before deploying
+      - name: Download site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages  # Must match the uploaded artifact name
+          path: docs/  # Ensure correct path
+
+      # Step 8: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
