@@ -38,16 +38,16 @@ jobs:
           ACCESS_TOKEN_GIT: ${{ secrets.ACCESS_TOKEN_GIT }}
         run: python scripts/fetch_issues.py
 
-      # Step 5: Upload the site files correctly for GitHub Pages
+      # Step 5: Upload the site files for GitHub Pages
       - name: Upload site files
-        uses: actions/upload-pages-artifact@v2  # ✅ Correct action
+        uses: actions/upload-pages-artifact@v3  # Updated to the latest version
         with:
-          path: docs/  # ✅ Ensure this is the correct folder containing index.html
+          path: docs/  # Ensure this is the correct folder containing index.html
 
       # Step 6: Setup GitHub Pages
       - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5  # Updated to the latest version
 
       # Step 7: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4  # Updated to the latest version
