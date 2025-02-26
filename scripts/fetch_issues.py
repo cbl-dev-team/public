@@ -21,19 +21,18 @@ def fetch_open_issues(org, repo):
             print(f"Failed to fetch issues for {repo}: {response.status_code}")
             break
         data = response.json()
-        if not data:  # No more issues
+        if not data:
             break
         
-        # Filter out pull requests by checking if "pull_request" key exists in the issue
         filtered_issues = [issue for issue in data if "pull_request" not in issue]
-        
         issues.extend(filtered_issues)
         page += 1
     
     return issues
-    
+
 def generate_html(issues_by_repo):
-    # Add some basic CSS for styling
+    assignees_set = set()
+    
     html_content = """
     <html>
     <head>
@@ -88,73 +87,71 @@ def generate_html(issues_by_repo):
                 background-color: #3f8df2;
                 color: white;
             }
-            .bug-label {
-                font-weight: bold;
-                padding: 2px 5px;
-                border-radius: 3px;
-                margin-right: 10px;
-                background-color: #ff4d4d;
-                color: white;
-            }
-            .task-label {
-                font-weight: bold;
-                padding: 2px 5px;
-                border-radius: 3px;
-                margin-right: 10px;
-                background-color: #4CAF50;
-                color: white;
-            }
         </style>
+        <script>
+            function filterIssues() {
+                let selectedAssignee = document.getElementById("assigneeFilter").value;
+                let issues = document.querySelectorAll(".issue-item");
+                
+                issues.forEach(issue => {
+                    let assignee = issue.getAttribute("data-assignee");
+                    if (selectedAssignee === "all" || assignee.includes(selectedAssignee)) {
+                        issue.style.display = "block";
+                    } else {
+                        issue.style.display = "none";
+                    }
+                });
+            }
+        </script>
     </head>
     <body>
         <h1>CBL Project - Open Issues</h1>
+        <label for="assigneeFilter">Filter by Assignee: </label>
+        <select id="assigneeFilter" onchange="filterIssues()">
+            <option value="all">All</option>
     """
+    
+    for repo, issues in issues_by_repo.items():
+        for issue in issues:
+            assignees = issue.get("assignees", [])
+            assignee_names = ", ".join([assignee["login"] for assignee in assignees])
+            if assignee_names:
+                assignees_set.update([assignee["login"] for assignee in assignees])
 
+    for assignee in sorted(assignees_set):
+        html_content += f'<option value="{assignee}">{assignee}</option>'
+    
+    html_content += """
+        </select>
+        <br><br>
+    """
+    
     for repo, issues in issues_by_repo.items():
         html_content += f"<h2>{repo}</h2><ol>"
         
-        if issues:
-            for issue in issues:
-                # Get the issue number
-                issue_number = issue.get("number", "")
-                
-                # Check if any labels are related to priority
-                labels = issue.get("labels", [])
-                label_text = ""
-                
-                # Check for specific priority labels
-                bug_task_label = ''
-                for label in labels:
-                    if label["name"].strip().lower() in ["bug", "bugs"]:
-                        bug_task_label = '<span class="bug-label">Bug</span>'
-                        
-                    if label["name"].lower() == "high-priority":
-                        label_text = '<span class="label high-priority">[High Priority]</span>'
-                    elif label["name"].lower() == "medium-priority":
-                        label_text = '<span class="label medium-priority">[Medium Priority]</span>'
-                    elif label["name"].lower() == "low-priority":
-                        label_text = '<span class="label low-priority">[Low Priority]</span>'
-
-                # Get assignee information
-                assignees = issue.get("assignees", [])
-                assignee_tag = ''
-                if assignees:
-                    # Format the assignees into a comma-separated list
-                    assignee_names = ", ".join([assignee["login"] for assignee in assignees])
-                    assignee_tag = f'<span class="assignees"> {assignee_names} </span>'
-
-                # Format issue with number, priority label, and assignee
-                html_content += f'<li>{label_text}<a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> {bug_task_label} {assignee_tag} </li>'
-        else:
-            html_content += "<li>No open issues</li>"
+        for issue in issues:
+            issue_number = issue.get("number", "")
+            labels = issue.get("labels", [])
+            label_text = ""
+            
+            for label in labels:
+                if label["name"].lower() == "high-priority":
+                    label_text = '<span class="label high-priority">[High Priority]</span>'
+                elif label["name"].lower() == "medium-priority":
+                    label_text = '<span class="label medium-priority">[Medium Priority]</span>'
+                elif label["name"].lower() == "low-priority":
+                    label_text = '<span class="label low-priority">[Low Priority]</span>'
+            
+            assignees = issue.get("assignees", [])
+            assignee_names = ", ".join([assignee["login"] for assignee in assignees])
+            html_content += f'<li class="issue-item" data-assignee="{assignee_names}">{label_text} <a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - {assignee_names}</li>'
         
         html_content += "</ol>"
-
+    
     html_content += """
     </body>
     </html>
     """
-
     return html_content
 
 def main():
@@ -165,7 +162,6 @@ def main():
 
     html_content = generate_html(issues_by_repo)
 
-    # Write HTML content to index.html in the docs folder
     with open(OUTPUT_FILE, 'w') as f:
         f.write(html_content)
     print(f"Generated {OUTPUT_FILE} with open issues.")
