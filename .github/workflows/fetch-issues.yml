@@ -9,9 +9,9 @@ on:
       - main
 
 permissions:
-  id-token: write  # Required for GitHub Pages deployment
-  contents: write  # Required to access the repository content
-  pages: write     # Required to deploy to GitHub Pages
+  id-token: write
+  contents: write
+  pages: write
 
 jobs:
   build-and-deploy:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Python environment
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -38,24 +38,16 @@ jobs:
           ACCESS_TOKEN_GIT: ${{ secrets.ACCESS_TOKEN_GIT }}
         run: python scripts/fetch_issues.py
 
-      # Step 5: Upload site files
+      # Step 5: Upload the site files correctly for GitHub Pages
       - name: Upload site files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v2  # ✅ Correct action
         with:
-          name: github-pages  # Artifact name must match
-          path: docs/  # Path to your generated site files
+          path: docs/  # ✅ Ensure this is the correct folder containing index.html
 
       # Step 6: Setup GitHub Pages
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      # Step 7: Download the uploaded artifact before deploying
-      - name: Download site artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages  # Must match the uploaded artifact name
-          path: docs/  # Ensure correct path
-
-      # Step 8: Deploy to GitHub Pages
+      # Step 7: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
