@@ -39,11 +39,25 @@ def generate_html(issues_by_repo):
         "aqhareus": "Aqhar (Dev)",
         "Mazri02": "Azri (Dev)",
         "hafyze": "Zul (Dev)",
-        "HaziqAS": "Haziq Anaki (Dev)"
+        "HaziqAS": "Haziq Anaki (QA/Project Manager)"
     }
 
     assignees_set = set()
     
+    # Helper function to determine issue priority value
+    # Assigns a numeric value to each priority label:
+    #   1 for "high-priority", 2 for "medium-priority", 3 for "low-priority"
+    # If none of these labels exist, returns 4 so the issue is sorted last.
+    def get_priority(issue):
+        priority_map = {
+            "high-priority": 1,
+            "medium-priority": 2,
+            "low-priority": 3
+        }
+        # Get all priorities from the issue's labels, defaulting to 4 if no match is found
+        priorities = [priority_map.get(label["name"].lower(), 4) for label in issue.get("labels", [])]
+        return min(priorities) if priorities else 4
+
     html_content = """
     <html>
     <head>
@@ -138,9 +152,11 @@ def generate_html(issues_by_repo):
     """
     
     for repo, issues in issues_by_repo.items():
+        # Sort issues by the determined priority using get_priority
+        sorted_issues = sorted(issues, key=get_priority)
         html_content += f"<h2>{repo}</h2><ol>"
         
-        for issue in issues:
+        for issue in sorted_issues:
             issue_number = issue.get("number", "")
             labels = issue.get("labels", [])
             label_text = ""
