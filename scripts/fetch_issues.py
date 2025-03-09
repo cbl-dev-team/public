@@ -31,6 +31,17 @@ def fetch_open_issues(org, repo):
     return issues
 
 def generate_html(issues_by_repo):
+
+    # Mapping for username substitutions
+    name_mapping = {
+        "ha22001872": "Hafiz (Dev)",
+        "mrafsyam": "Raf (Dev)",
+        "aqhareus": "Aqhar (Dev)",
+        "Mazri02": "Azri (Dev)",
+        "hafyze": "Zul (Dev)",
+        "HaziqAS": "Haziq Anaki (Dev)"
+    }
+
     assignees_set = set()
     
     html_content = """
@@ -143,7 +154,12 @@ def generate_html(issues_by_repo):
                     label_text = '<span class="label low-priority">[Low Priority]</span>'
             
             assignees = issue.get("assignees", [])
-            assignee_names = ", ".join([assignee["login"] for assignee in assignees])
+
+            # Replace usernames based on mapping
+            assignee_names = ", ".join(
+                [name_mapping.get(assignee["login"], assignee["login"]) for assignee in assignees]
+            )
+        
             html_content += f'<li class="issue-item" data-assignee="{assignee_names}">{label_text} <a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - {assignee_names}</li>'
         
         html_content += "</ol>"
