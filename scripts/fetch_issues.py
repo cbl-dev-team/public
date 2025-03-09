@@ -141,15 +141,18 @@ def generate_html(issues_by_repo):
             <option value="all">All</option>
     """
     
+    # Collect all assignees (logins) from issues
     for repo, issues in issues_by_repo.items():
         for issue in issues:
             assignees = issue.get("assignees", [])
-            assignee_names = ", ".join([assignee["login"] for assignee in assignees])
-            if assignee_names:
-                assignees_set.update([assignee["login"] for assignee in assignees])
+            if assignees:
+                for assignee in assignees:
+                    assignees_set.add(assignee["login"])
 
+    # Populate the dropdown using mapped names
     for assignee in sorted(assignees_set):
-        html_content += f'<option value="{assignee}">{assignee}</option>'
+        mapped_name = name_mapping.get(assignee, assignee)
+        html_content += f'<option value="{mapped_name}">{mapped_name}</option>'
     
     html_content += """
         </select>
