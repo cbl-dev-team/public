@@ -39,7 +39,7 @@ def generate_html(issues_by_repo):
         "aqhareus": "Aqhar (Dev)",
         "Mazri02": "Azri (Dev)",
         "hafyze": "Zul (Dev)",
-        "HaziqAS": "Haziq Anaki (QA/Project Manager)"
+        "HaziqAS": "Haziq Anaki (QA / Project Manager)"
     }
 
     assignees_set = set()
@@ -112,6 +112,11 @@ def generate_html(issues_by_repo):
                 background-color: #3f8df2;
                 color: white;
             }
+            /* New style for status labels */
+            .status-label {
+                background-color: #2196F3;
+                color: white;
+            }
         </style>
         <script>
             function filterIssues() {
@@ -159,16 +164,29 @@ def generate_html(issues_by_repo):
         for issue in sorted_issues:
             issue_number = issue.get("number", "")
             labels = issue.get("labels", [])
-            label_text = ""
-            
+
+            # We'll collect both priority labels and status labels
+            # into a list, then join them into label_text.
+            label_html_list = []
             for label in labels:
-                if label["name"].lower() == "high-priority":
-                    label_text = '<span class="label high-priority">[High Priority]</span>'
-                elif label["name"].lower() == "medium-priority":
-                    label_text = '<span class="label medium-priority">[Medium Priority]</span>'
-                elif label["name"].lower() == "low-priority":
-                    label_text = '<span class="label low-priority">[Low Priority]</span>'
-            
+                label_lower = label["name"].lower()
+                
+                # Keep existing priority logic
+                if label_lower == "high-priority":
+                    label_html_list.append('<span class="label high-priority">[High Priority]</span>')
+                elif label_lower == "medium-priority":
+                    label_html_list.append('<span class="label medium-priority">[Medium Priority]</span>')
+                elif label_lower == "low-priority":
+                    label_html_list.append('<span class="label low-priority">[Low Priority]</span>')
+                
+                # Add status label if it starts with "status : "
+                elif label_lower.startswith("status : "):
+                    # Display the full label name as-is
+                    label_html_list.append(f'<span class="label status-label">{label["name"]}</span>')
+
+            # Join all collected label HTML fragments
+            label_text = " ".join(label_html_list)
+
             assignees = issue.get("assignees", [])
 
             # Replace usernames based on mapping
