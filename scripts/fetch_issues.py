@@ -24,6 +24,7 @@ def fetch_open_issues(org, repo):
         if not data:
             break
         
+        # Filter out pull requests
         filtered_issues = [issue for issue in data if "pull_request" not in issue]
         issues.extend(filtered_issues)
         page += 1
@@ -45,16 +46,12 @@ def generate_html(issues_by_repo):
     assignees_set = set()
     
     # Helper function to determine issue priority value
-    # Assigns a numeric value to each priority label:
-    #   1 for "high-priority", 2 for "medium-priority", 3 for "low-priority"
-    # If none of these labels exist, returns 4 so the issue is sorted last.
     def get_priority(issue):
         priority_map = {
             "high-priority": 1,
             "medium-priority": 2,
             "low-priority": 3
         }
-        # Get all priorities from the issue's labels, defaulting to 4 if no match is found
         priorities = [priority_map.get(label["name"].lower(), 4) for label in issue.get("labels", [])]
         return min(priorities) if priorities else 4
 
@@ -112,7 +109,6 @@ def generate_html(issues_by_repo):
                 background-color: #3f8df2;
                 color: white;
             }
-            /* New style for status labels */
             .status-label {
                 background-color: #2196F3;
                 color: white;
@@ -141,18 +137,19 @@ def generate_html(issues_by_repo):
             <option value="all">All</option>
     """
     
-    # Collect all assignees (logins) from issues
+    # Collect all assignees (mapped names) from issues and add "None" if missing
     for repo, issues in issues_by_repo.items():
         for issue in issues:
             assignees = issue.get("assignees", [])
             if assignees:
                 for assignee in assignees:
-                    assignees_set.add(assignee["login"])
-
-    # Populate the dropdown using mapped names
+                    assignees_set.add(name_mapping.get(assignee["login"], assignee["login"]))
+            else:
+                assignees_set.add("None")
+    
+    # Populate the dropdown filter
     for assignee in sorted(assignees_set):
-        mapped_name = name_mapping.get(assignee, assignee)
-        html_content += f'<option value="{mapped_name}">{mapped_name}</option>'
+        html_content += f'<option value="{assignee}">{assignee}</option>'
     
     html_content += """
         </select>
@@ -160,7 +157,6 @@ def generate_html(issues_by_repo):
     """
     
     for repo, issues in issues_by_repo.items():
-        # Sort issues by the determined priority using get_priority
         sorted_issues = sorted(issues, key=get_priority)
         html_content += f"<h2>{repo}</h2><ol>"
         
@@ -168,34 +164,27 @@ def generate_html(issues_by_repo):
             issue_number = issue.get("number", "")
             labels = issue.get("labels", [])
 
-            # We'll collect both priority labels and status labels
-            # into a list, then join them into label_text.
             label_html_list = []
             for label in labels:
                 label_lower = label["name"].lower()
-                
-                # Keep existing priority logic
                 if label_lower == "high-priority":
                     label_html_list.append('<span class="label high-priority">[High Priority]</span>')
                 elif label_lower == "medium-priority":
                     label_html_list.append('<span class="label medium-priority">[Medium Priority]</span>')
                 elif label_lower == "low-priority":
                     label_html_list.append('<span class="label low-priority">[Low Priority]</span>')
-                
-                # Add status label if it starts with "status : "
                 elif label_lower.startswith("status : "):
-                    # Display the full label name as-is
                     label_html_list.append(f'<span class="label status-label">{label["name"]}</span>')
 
-            # Join all collected label HTML fragments
             label_text = " ".join(label_html_list)
 
             assignees = issue.get("assignees", [])
-
-            # Replace usernames based on mapping
-            assignee_names = ", ".join(
-                [name_mapping.get(assignee["login"], assignee["login"]) for assignee in assignees]
-            )
+            if assignees:
+                assignee_names = ", ".join(
+                    [name_mapping.get(assignee["login"], assignee["login"]) for assignee in assignees]
+                )
+            else:
+                assignee_names = "None"
         
             html_content += f'<li class="issue-item" data-assignee="{assignee_names}">{label_text} <a href="{issue["html_url"]}">#{issue_number} {issue["title"]}</a> - {assignee_names}</li>'
         
