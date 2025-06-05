@@ -40,7 +40,9 @@ def generate_html(issues_by_repo):
         "aqhareus": "Aqhar (Dev)",
         "Mazri02": "Azri (Dev)",
         "hafyze": "Zul (Dev)",
-        "HaziqAS": "Haziq Anaki (QA / Project Manager)"
+        "lokmannhi": "Lokman (Dev)",
+        "irfnrzk": "Irfan (Dev)",
+        "HaziqAS": "Haziq Anaki (QA)"
     }
 
     assignees_set = set()
